@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="sort_names">
+        <item>@string/popular</item>
+        <item>@string/top_rated</item>
+    </string-array>
+    <string-array name="sort_values">
+        <item>@string/popular</item>
+        <item>@string/top_rated</item>
+    </string-array>
+</resources>
