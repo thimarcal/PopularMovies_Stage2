@@ -14,6 +14,8 @@ import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import gmp.thiago.popularmovies.BuildConfig;
+
 /**
  * Created by thiagom on 9/27/17.
  */
@@ -26,7 +28,7 @@ public class NetworkUtils {
     private static final String TOP_RATED_SEARCH = "top_rated";
 
     private static final String API_KEY_PARAM = "api_key";
-    private static final String API_KEY = ""; // Add Valid TheMoviesDB API KEY here
+    private static final String API_KEY = BuildConfig.API_KEY; // Add Valid TheMoviesDB API KEY here
     public static final int SEARCH_BY_POPULAR = 0;
     public static final int SEARCH_BY_TOP_RATED = 1;
 

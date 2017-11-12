@@ -10,8 +10,7 @@ import java.util.List;
  * Created by thiagom on 9/28/17.
  */
 
-public class MovieJson {
-
+public class MovieJson implements Parcelable {
 
     /**
      * JSON Object for the response from TheMovieDB
@@ -22,6 +21,39 @@ public class MovieJson {
     private int total_results;
     private int total_pages;
     private List<Movie> results;
+
+    public MovieJson(Parcel parcel) {
+        page = parcel.readInt();
+        total_results = parcel.readInt();
+        total_pages = parcel.readInt();
+        results = new ArrayList<>();
+        parcel.readList(results, null);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(page);
+        parcel.writeInt(total_results);
+        parcel.writeInt(total_pages);
+        parcel.writeArray(results.toArray());
+    }
+
+    public static final Parcelable.Creator<MovieJson> CREATOR = new Creator<MovieJson>() {
+        @Override
+        public MovieJson createFromParcel(Parcel in) {
+            return new MovieJson(in);
+        }
+
+        @Override
+        public MovieJson[] newArray(int size) {
+            return new MovieJson[size];
+        }
+    };
 
     public int getPage() {
         return page;

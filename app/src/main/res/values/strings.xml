@@ -5,6 +5,8 @@
 
     <string name="invalid_search">Invalid search criteria. Please select a valid search criteria in Settings</string>
 
+    <string name="disconnected_msg">Connection is not available. Connect to a network and try again.</string>
+
     <string name="movies_key" translatable="false">movies</string>
     <string name="sort_by_key" translatable="false">sort_by</string>
 

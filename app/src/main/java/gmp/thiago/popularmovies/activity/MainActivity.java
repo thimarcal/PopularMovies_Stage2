@@ -3,6 +3,9 @@ package gmp.thiago.popularmovies.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +15,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -22,12 +28,16 @@ import java.util.ArrayList;
 import gmp.thiago.popularmovies.R;
 import gmp.thiago.popularmovies.adapter.MovieAdapter;
 import gmp.thiago.popularmovies.data.MovieJson;
+import gmp.thiago.popularmovies.task.FetchMoviesData;
+import gmp.thiago.popularmovies.task.TaskCompleteListener;
 import gmp.thiago.popularmovies.utilities.NetworkUtils;
 
 public class MainActivity extends AppCompatActivity
                                          implements MovieAdapter.MovieClickListener,
-                                            SharedPreferences.OnSharedPreferenceChangeListener {
+                                            SharedPreferences.OnSharedPreferenceChangeListener,
+                                            TaskCompleteListener <String> {
     private RecyclerView mMoviesRV;
+    private TextView disconnectedTextView;
     private GridLayoutManager layoutManager;
     private MovieAdapter mMovieAdapter;
 
@@ -43,6 +53,7 @@ public class MainActivity extends AppCompatActivity
          * Adapter and Layout Manager.
          */
         mMoviesRV = (RecyclerView)findViewById(R.id.recyclerview_movies);
+        disconnectedTextView = (TextView)findViewById(R.id.disconnected_textview);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             layoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
@@ -76,12 +87,28 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadMovies() {
+        ConnectivityManager connManager = (ConnectivityManager)
+                                                getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
+        boolean isConnected = (networkInfo != null) && (networkInfo.isConnected());
+
+        if (!isConnected) {
+            disconnectedTextView.setVisibility(View.VISIBLE);
+            mMoviesRV.setVisibility(View.INVISIBLE);
+            return;
+        }
+
+        disconnectedTextView.setVisibility(View.INVISIBLE);
+        mMoviesRV.setVisibility(View.VISIBLE);
+
         String sortType = sharedPreferences.getString(getString(R.string.sort_by_key),
                                                       getString(R.string.popular));
         if (sortType.equals(getString(R.string.popular))) {
-            new FetchMoviesData().execute(NetworkUtils.SEARCH_BY_POPULAR);
+            new FetchMoviesData(this, this)
+                    .execute(NetworkUtils.SEARCH_BY_POPULAR);
         } else if (sortType.equals(getString(R.string.top_rated))) {
-            new FetchMoviesData().execute(NetworkUtils.SEARCH_BY_TOP_RATED);
+            new FetchMoviesData(this, this)
+                    .execute(NetworkUtils.SEARCH_BY_TOP_RATED);
         }
     }
 
@@ -131,42 +158,14 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onTaskCompleted(String result) {
+        // Here, we'll transform the JSON into a MovieJson Object using Gson
+        Gson gson = new Gson();
+        MovieJson jsonObject = gson.fromJson(result, MovieJson.class);
 
-    /**
-     * AsyncTask for Fetching Movies data from TheMoviesDB
-     */
-    public class FetchMoviesData extends AsyncTask<Integer, Void, String> {
-
-        @Override
-        protected String doInBackground(Integer... params) {
-
-            String jsonMoviesResponse = null;
-            // If there's no search type, there's nothing we can do here
-            if(params.length == 0) {
-                return null;
-            }
-
-            int searchType = params[0];
-            URL moviesUrl = NetworkUtils.buildUrl(searchType);
-
-            try {
-                jsonMoviesResponse = NetworkUtils.getHttpResponse(moviesUrl);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return jsonMoviesResponse;
-        }
-
-        @Override
-        protected void onPostExecute(String response) {
-            // Here, we'll transform the JSON into a MovieJson Object using Gson
-            Gson gson = new Gson();
-            MovieJson jsonObject = gson.fromJson(response, MovieJson.class);
-
-            if (null != mMovieAdapter && null != jsonObject) {
-                mMovieAdapter.setMovies(jsonObject.getResults());
-            }
+        if (null != mMovieAdapter && null != jsonObject) {
+            mMovieAdapter.setMovies(jsonObject.getResults());
         }
     }
 }
