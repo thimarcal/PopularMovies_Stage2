@@ -15,4 +15,9 @@
 
     <string name="rating">Rating:</string>
     <string name="release">Released:</string>
+    <string name="reviews">Reviews:</string>
+
+    <string name="trailer">Trailer </string>
+
+    <string name="reviews_key" translatable="false">reviews</string>
 </resources>

@@ -5,5 +5,8 @@ package gmp.thiago.popularmovies.task;
  */
 
 public interface TaskCompleteListener<T> {
-    public void onTaskCompleted(T result);
+    public static final int MOVIE_DATA = 1;
+    public static final int MOVIE_TRAILER = 2;
+    public static final int MOVIE_REVIEW = 3;
+    public void onTaskCompleted(T result, int type);
 }

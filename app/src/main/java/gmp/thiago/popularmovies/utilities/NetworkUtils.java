@@ -27,10 +27,15 @@ public class NetworkUtils {
     private static final String POPULAR_SEARCH = "popular";
     private static final String TOP_RATED_SEARCH = "top_rated";
 
+    private static final String TRAILERS = "videos";
+    private static final String REVIEWS = "reviews";
+
     private static final String API_KEY_PARAM = "api_key";
     private static final String API_KEY = BuildConfig.API_KEY; // Add Valid TheMoviesDB API KEY here
     public static final int SEARCH_BY_POPULAR = 0;
     public static final int SEARCH_BY_TOP_RATED = 1;
+
+    public static final String YOUTUBE_BASE = "https://www.youtube.com/watch?v=";
 
     public static URL buildUrl(int searchType) {
 
@@ -50,6 +55,42 @@ public class NetworkUtils {
                                 .appendPath(searchLocation)
                                 .appendQueryParameter(API_KEY_PARAM, API_KEY)
                                 .build();
+
+        URL queryURL = null;
+        try {
+            queryURL = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return queryURL;
+    }
+
+    public static URL buildTrailerUrl(int movieId) {
+
+        Uri builtUri = Uri.parse(BASE_MOVIESDB_URL).buildUpon()
+                                .appendPath(""+movieId)
+                                .appendPath(TRAILERS)
+                                .appendQueryParameter(API_KEY_PARAM, API_KEY)
+                                .build();
+
+        URL queryURL = null;
+        try {
+            queryURL = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return queryURL;
+    }
+
+    public static URL buildReviewsUrl(int movieId) {
+
+        Uri builtUri = Uri.parse(BASE_MOVIESDB_URL).buildUpon()
+                .appendPath(""+movieId)
+                .appendPath(REVIEWS)
+                .appendQueryParameter(API_KEY_PARAM, API_KEY)
+                .build();
 
         URL queryURL = null;
         try {

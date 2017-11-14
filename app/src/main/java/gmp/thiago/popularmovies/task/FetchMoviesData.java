@@ -7,12 +7,9 @@ package gmp.thiago.popularmovies.task;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.google.gson.Gson;
-
 import java.io.IOException;
 import java.net.URL;
 
-import gmp.thiago.popularmovies.data.MovieJson;
 import gmp.thiago.popularmovies.utilities.NetworkUtils;
 
 /**
@@ -23,7 +20,7 @@ public class FetchMoviesData extends AsyncTask<Integer, Void, String> {
     private Context mContext;
     private TaskCompleteListener<String> mListener;
 
-    public FetchMoviesData (Context context, TaskCompleteListener<String> listener) {
+    public FetchMoviesData(Context context, TaskCompleteListener<String> listener) {
         mContext = context;
         mListener = listener;
     }
@@ -33,7 +30,7 @@ public class FetchMoviesData extends AsyncTask<Integer, Void, String> {
 
         String jsonMoviesResponse = null;
         // If there's no search type, there's nothing we can do here
-        if(params.length == 0) {
+        if (params.length == 0) {
             return null;
         }
 
@@ -51,6 +48,6 @@ public class FetchMoviesData extends AsyncTask<Integer, Void, String> {
 
     @Override
     protected void onPostExecute(String response) {
-        mListener.onTaskCompleted(response);
+        mListener.onTaskCompleted(response, TaskCompleteListener.MOVIE_DATA);
     }
 }

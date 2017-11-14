@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -147,6 +148,9 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this, MovieDetailActivity.class);
         intent.putExtra(getString(R.string.movies_key), movie);
 
+        URL url = NetworkUtils.buildTrailerUrl(movie.getId());
+        Log.d("Thiago", ""+url.toExternalForm());
+
         startActivity(intent);
     }
 
@@ -159,13 +163,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onTaskCompleted(String result) {
+    public void onTaskCompleted(String result, int type) {
         // Here, we'll transform the JSON into a MovieJson Object using Gson
-        Gson gson = new Gson();
-        MovieJson jsonObject = gson.fromJson(result, MovieJson.class);
+        if (MOVIE_DATA == type) {
+            Gson gson = new Gson();
+            MovieJson jsonObject = gson.fromJson(result, MovieJson.class);
 
-        if (null != mMovieAdapter && null != jsonObject) {
-            mMovieAdapter.setMovies(jsonObject.getResults());
+            if (null != mMovieAdapter && null != jsonObject) {
+                mMovieAdapter.setMovies(jsonObject.getResults());
+            }
         }
     }
 }
