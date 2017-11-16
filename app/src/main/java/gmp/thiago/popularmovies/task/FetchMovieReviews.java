@@ -34,8 +34,6 @@ public class FetchMovieReviews extends AsyncTask<Integer, Void, String> {
         int movieId = params[0];
         URL moviesUrl = NetworkUtils.buildReviewsUrl(movieId);
 
-        Log.d("Thiago", moviesUrl.toExternalForm());
-
         try {
             jsonReviewsResponse = NetworkUtils.getHttpResponse(moviesUrl);
         } catch (IOException e) {

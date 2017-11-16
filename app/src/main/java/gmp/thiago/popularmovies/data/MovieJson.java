@@ -107,6 +107,23 @@ public class MovieJson implements Parcelable {
         private String release_date;
         private List<Integer> genre_ids;
 
+        public Movie() {
+            vote_count = 0;
+            id = 0;
+            video = false;
+            vote_average = 0;
+            title = "";
+            popularity = 0;
+            poster_path = "";
+            original_language = "";
+            original_title = "";
+            backdrop_path = "";
+            adult = false;
+            overview = "";
+            release_date = "";
+            genre_ids = new ArrayList<>();
+        }
+
         public Movie(Parcel in) {
             vote_count = in.readInt();
             id = in.readInt();

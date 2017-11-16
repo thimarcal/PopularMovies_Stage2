@@ -34,6 +34,11 @@
                 android:value=".activity.MainActivity" />
         </activity>
         <activity android:name=".activity.ReviewsActivity"></activity>
+
+        <provider
+            android:authorities="gmp.thiago.popularmovies"
+            android:name="gmp.thiago.popularmovies.data.MoviesContentProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>

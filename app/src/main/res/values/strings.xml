@@ -12,6 +12,11 @@
 
     <string name="popular">Popular</string>
     <string name="top_rated">Top Rated</string>
+    <string name="favorite">Favorites</string>
+
+    <string name="popular_key" translatable="false">popular</string>
+    <string name="top_rated_key" translatable="false">top_rated</string>
+    <string name="favorite_key" translatable="false">favorites</string>
 
     <string name="rating">Rating:</string>
     <string name="release">Released:</string>

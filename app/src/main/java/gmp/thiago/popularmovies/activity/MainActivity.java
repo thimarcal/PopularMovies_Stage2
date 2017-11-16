@@ -3,6 +3,7 @@ package gmp.thiago.popularmovies.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 
 import gmp.thiago.popularmovies.R;
 import gmp.thiago.popularmovies.adapter.MovieAdapter;
+import gmp.thiago.popularmovies.data.MovieContract;
 import gmp.thiago.popularmovies.data.MovieJson;
 import gmp.thiago.popularmovies.task.FetchMoviesData;
 import gmp.thiago.popularmovies.task.TaskCompleteListener;
@@ -92,8 +94,10 @@ public class MainActivity extends AppCompatActivity
                                                 getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
         boolean isConnected = (networkInfo != null) && (networkInfo.isConnected());
+        String sortType = sharedPreferences.getString(getString(R.string.sort_by_key),
+                getString(R.string.popular_key));
 
-        if (!isConnected) {
+        if (!isConnected && !sortType.equals(getString(R.string.favorite_key))) {
             disconnectedTextView.setVisibility(View.VISIBLE);
             mMoviesRV.setVisibility(View.INVISIBLE);
             return;
@@ -102,14 +106,40 @@ public class MainActivity extends AppCompatActivity
         disconnectedTextView.setVisibility(View.INVISIBLE);
         mMoviesRV.setVisibility(View.VISIBLE);
 
-        String sortType = sharedPreferences.getString(getString(R.string.sort_by_key),
-                                                      getString(R.string.popular));
-        if (sortType.equals(getString(R.string.popular))) {
+        if (sortType.equals(getString(R.string.popular_key))) {
             new FetchMoviesData(this, this)
                     .execute(NetworkUtils.SEARCH_BY_POPULAR);
-        } else if (sortType.equals(getString(R.string.top_rated))) {
+        } else if (sortType.equals(getString(R.string.top_rated_key))) {
             new FetchMoviesData(this, this)
                     .execute(NetworkUtils.SEARCH_BY_TOP_RATED);
+        } else if (sortType.equals(getString(R.string.favorite_key))) {
+            Cursor moviesCursor = getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null);
+            ArrayList<MovieJson.Movie> moviesList= new ArrayList<>();
+
+            while (moviesCursor.moveToNext()) {
+                MovieJson.Movie movie = new MovieJson.Movie();
+                movie.setId(moviesCursor.getInt(
+                        moviesCursor.getColumnIndex(MovieContract.MovieEntry.MOVIE_ID)));
+                movie.setOriginal_title(moviesCursor.getString(
+                        moviesCursor.getColumnIndex(MovieContract.MovieEntry.MOVIE_NAME)));
+                movie.setOverview(moviesCursor.getString(
+                        moviesCursor.getColumnIndex(MovieContract.MovieEntry.OVERVIEW)));
+                movie.setRelease_date(moviesCursor.getString(
+                        moviesCursor.getColumnIndex(MovieContract.MovieEntry.RELEASE_DATE)));
+                movie.setVote_average(Float.parseFloat(moviesCursor.getString(
+                        moviesCursor.getColumnIndex(MovieContract.MovieEntry.USER_RATING))));
+
+                movie.setPoster_path(moviesCursor.getString(
+                        moviesCursor.getColumnIndex(MovieContract.MovieEntry.MOVIE_POSTER)));
+
+                moviesList.add(movie);
+            }
+
+            mMovieAdapter.setMovies(moviesList);
         }
     }
 
@@ -149,8 +179,6 @@ public class MainActivity extends AppCompatActivity
         intent.putExtra(getString(R.string.movies_key), movie);
 
         URL url = NetworkUtils.buildTrailerUrl(movie.getId());
-        Log.d("Thiago", ""+url.toExternalForm());
-
         startActivity(intent);
     }
 

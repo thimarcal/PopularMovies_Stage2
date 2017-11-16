@@ -3,9 +3,11 @@
     <string-array name="sort_names">
         <item>@string/popular</item>
         <item>@string/top_rated</item>
+        <item>@string/favorite</item>
     </string-array>
     <string-array name="sort_values">
-        <item>@string/popular</item>
-        <item>@string/top_rated</item>
+        <item>@string/popular_key</item>
+        <item>@string/top_rated_key</item>
+        <item>@string/favorite_key</item>
     </string-array>
 </resources>

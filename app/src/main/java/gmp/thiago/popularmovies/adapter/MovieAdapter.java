@@ -1,8 +1,13 @@
 package gmp.thiago.popularmovies.adapter;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -49,15 +54,28 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     @Override
     public void onBindViewHolder(MovieViewHolder holder, int position) {
         String posterPath = mMovies.get(position).getPoster_path();
-        posterPath = IMAGE_BASE_URL+IMAGE_SIZE+posterPath;
-        Uri uri = Uri.parse(posterPath);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        String sortType = sharedPreferences.getString(mContext.getString(R.string.sort_by_key),
+                mContext.getString(R.string.popular_key));
 
-        Picasso.with(mContext)
-                            .load(uri)
-                            .placeholder(R.drawable.ic_image)
-                            .into(holder.moviePoster);
+        if (!sortType.equals(mContext.getString(R.string.favorite_key))) {
+            posterPath = IMAGE_BASE_URL + IMAGE_SIZE + posterPath;
+            Uri uri = Uri.parse(posterPath);
+
+            Picasso.with(mContext)
+                    .load(uri)
+                    .placeholder(R.drawable.ic_image)
+                    .into(holder.moviePoster);
+        } else {
+            byte[] data = Base64.decode(posterPath, Base64.DEFAULT);
+            Bitmap bm;
+            BitmapFactory.Options opt = new BitmapFactory.Options();
+            opt.inMutable = true;
+            bm = BitmapFactory.decodeByteArray(data, 0, data.length, opt);
+
+            holder.moviePoster.setImageBitmap(bm);
+        }
         holder.itemView.setTag(position);
-
     }
 
     @Override
